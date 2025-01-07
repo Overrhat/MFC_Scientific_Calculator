@@ -15,8 +15,8 @@ CSigmaCalcDlg::CSigmaCalcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SIGMACALC_DIALOG, pParent)
     , m_strWorking(_T(""))
     , m_strOutput(_T(""))
-    , m_strUpper(_T(""))
-    , m_strLower(_T(""))
+    , m_strUpper(_T("10"))
+    , m_strLower(_T("1"))
     , m_strInput(_T(""))
 {
     // Initialise new Sigma

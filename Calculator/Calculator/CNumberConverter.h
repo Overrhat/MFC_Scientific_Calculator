@@ -21,6 +21,7 @@ private:
     static bool isOperator(char c);
     static int precedence(char op);
     static double applyOp(double a, double b, char op);
+    static std::string addSpacesAroundOperators(const std::string& expression);
 public:
     static double evaluateExpression(const std::string& expression);
     static std::string substituteN(const std::string& expression, int n);

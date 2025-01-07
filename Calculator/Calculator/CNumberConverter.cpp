@@ -45,6 +45,60 @@ double CNumberConverter::applyOp(double a, double b, char op) {
     }
 }
 
+string CNumberConverter::addSpacesAroundOperators(const std::string& expression) {
+    std::string spacedExpression;
+
+    size_t i = 0;
+
+    // Check if the first character is a negative sign
+    if (!expression.empty() && expression[0] == '-') {
+        spacedExpression += "0 - ";
+        i++; // Skip the negative sign as it's already processed
+    }
+
+    // Process the rest of the expression
+    for (; i < expression.size(); ++i) {
+        char current = expression[i];
+
+        // Check if the current character is an operator or a parenthesis
+        if (current == '+' || current == '-' || current == '*' || current == '/' ||
+            current == '(' || current == ')') {
+            // Add a space before the operator, unless it's the first character
+            if (!spacedExpression.empty() && !isspace(spacedExpression.back())) {
+                spacedExpression += ' ';
+            }
+            // Add the operator/parenthesis
+            spacedExpression += current;
+            // Add a space after the operator/parenthesis
+            if (i + 1 < expression.size() && !isspace(expression[i + 1])) {
+                spacedExpression += ' ';
+            }
+        }
+        else {
+            // Add the current character (numbers, letters, etc.)
+            spacedExpression += current;
+        }
+    }
+
+    // Normalize spaces (remove extra spaces if any)
+    std::string finalExpression;
+    bool lastWasSpace = false;
+    for (char c : spacedExpression) {
+        if (isspace(c)) {
+            if (!lastWasSpace) {
+                finalExpression += ' ';
+                lastWasSpace = true;
+            }
+        }
+        else {
+            finalExpression += c;
+            lastWasSpace = false;
+        }
+    }
+
+    return finalExpression;
+}
+
 string CNumberConverter::substituteN(const std::string& expression, int n) {
     std::string substitutedExpression;
     size_t i = 0;
@@ -60,7 +114,7 @@ string CNumberConverter::substituteN(const std::string& expression, int n) {
 
             // Check if followed by 'n'
             if (i < expression.size() && expression[i] == 'n') {
-                substitutedExpression += coefficient + " * " + std::to_string(n);
+                substitutedExpression += coefficient + "*" + std::to_string(n); // Removed spaces
                 i++;
             }
             else {
@@ -69,17 +123,27 @@ string CNumberConverter::substituteN(const std::string& expression, int n) {
         }
         else if (expression[i] == 'n') {
             // Handle standalone 'n'
-            substitutedExpression += "1 * " + std::to_string(n);
+            substitutedExpression += "1*" + std::to_string(n); // Removed spaces
             i++;
         }
         else if (expression[i] == '-' && (i + 1 < expression.size() && expression[i + 1] == 'n')) {
             // Handle `-n` explicitly
-            substitutedExpression += "-1 * " + std::to_string(n);
+            substitutedExpression += "-1*" + std::to_string(n); // Removed spaces
             i += 2; // Skip over `-` and `n`
         }
         else if (expression[i] == '-' || expression[i] == '+' || expression[i] == '*' || expression[i] == '/') {
-            // Add spaces around operators
-            substitutedExpression += " " + std::string(1, expression[i]) + " ";
+            // Directly append the operator without adding spaces
+            substitutedExpression += expression[i];
+            i++;
+        }
+        else if (expression[i] == '(' || expression[i] == ')') {
+            // Directly append parentheses without adding spaces
+            substitutedExpression += expression[i];
+
+            // Check for multiplication after closing parenthesis
+            if (expression[i] == ')' && i + 1 < expression.size() && expression[i + 1] == 'n') {
+                substitutedExpression += "*";
+            }
             i++;
         }
         else if (isspace(expression[i])) {
@@ -87,26 +151,22 @@ string CNumberConverter::substituteN(const std::string& expression, int n) {
             i++;
         }
         else {
-            // Other characters (e.g., parentheses)
+            // Handle other characters
             substitutedExpression += expression[i];
             i++;
         }
     }
 
-    // Normalize spaces
-    std::string finalExpression;
-    std::unique_copy(substitutedExpression.begin(), substitutedExpression.end(),
-        std::back_inserter(finalExpression),
-        [](char a, char b) { return isspace(a) && isspace(b); });
-
-    return finalExpression;
+    // No need to normalize spaces since we're not adding unnecessary ones
+    return substitutedExpression;
 }
 
 double CNumberConverter::evaluateExpression(const string& expression) {
     stack<char> operators;    // Stack to hold operators
     stack<double> operands;   // Stack to hold operands (double instead of int)
+    string equation = addSpacesAroundOperators(expression);
 
-    stringstream ss(expression);
+    stringstream ss(equation);
     string token;
 
     while (ss >> token) {
