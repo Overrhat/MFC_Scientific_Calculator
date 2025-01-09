@@ -1,2 +1,15 @@
-﻿  CNumberConverter.cpp
-  Calculator.vcxproj -> E:\OneDrive - 동아엘텍\바탕 화면\김예루 프로젝트\Calculator\Debug\Calculator.exe
+﻿  pch.cpp
+  Calculator.cpp
+  CalculatorDlg.cpp
+  CProgrammerCalcDlg.cpp
+  CScientificCalcDlg.cpp
+  CScientificCtrl.cpp
+  CSigmaCalcDlg.cpp
+  CMathOperations.cpp
+E:\OneDrive - 동아엘텍\바탕 화면\MFC_Scientific_Calculator\Calculator\Calculator\CMathOperations.cpp(36,62): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+E:\OneDrive - 동아엘텍\바탕 화면\MFC_Scientific_Calculator\Calculator\Calculator\CMathOperations.cpp(271,30): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  CNumberConverter.cpp
+  CProgrammerCtrl.cpp
+  CSigmaCtrl.cpp
+  Generating Code...
+  Calculator.vcxproj -> E:\OneDrive - 동아엘텍\바탕 화면\MFC_Scientific_Calculator\Calculator\Debug\Calculator.exe

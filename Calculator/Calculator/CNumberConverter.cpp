@@ -50,6 +50,24 @@ string CNumberConverter::addSpacesAroundOperators(const std::string& expression)
 
     size_t i = 0;
 
+    bool firstIsNegative = false;
+    int j = 0;
+
+    // Checking if the first occurence is negative number
+    while (!firstIsNegative) {
+        char ch = expression[j];
+        if (ch == '(') {
+            j++;
+            continue;
+        }
+        else if (ch == '-') {
+            firstIsNegative = true;
+        }
+        else {
+            break;
+        }
+    }
+
     // Check if the first character is a negative sign
     if (!expression.empty() && expression[0] == '-') {
         spacedExpression += "0 - ";
@@ -62,7 +80,7 @@ string CNumberConverter::addSpacesAroundOperators(const std::string& expression)
 
         // Check if the current character is an operator or a parenthesis
         if (current == '+' || current == '-' || current == '*' || current == '/' ||
-            current == '(' || current == ')') {
+            current == '(' || current == ')' || current == '^') {
             // Add a space before the operator, unless it's the first character
             if (!spacedExpression.empty() && !isspace(spacedExpression.back())) {
                 spacedExpression += ' ';
@@ -78,6 +96,11 @@ string CNumberConverter::addSpacesAroundOperators(const std::string& expression)
             // Add the current character (numbers, letters, etc.)
             spacedExpression += current;
         }
+    }
+
+    // Add zero for the first negative number
+    if (!expression.empty() && expression[0] != '-' && firstIsNegative) {
+        spacedExpression.insert(2 * j, "0 ");
     }
 
     // Normalize spaces (remove extra spaces if any)
@@ -157,7 +180,6 @@ string CNumberConverter::substituteN(const std::string& expression, int n) {
         }
     }
 
-    // No need to normalize spaces since we're not adding unnecessary ones
     return substitutedExpression;
 }
 
@@ -283,4 +305,27 @@ CString CNumberConverter::decToOct(int input)
     }
 
     return result;
+}
+
+int CNumberConverter::hexToDect(CString input)
+{
+    int ans = 0;
+
+    for (int i = input.GetLength() - 1; i >= 0; --i) {
+        TCHAR ch = input.GetAt(i);
+        int value = 0;
+
+        // Check for numeric characters
+        if (ch >= _T('0') && ch <= _T('9')) {
+            value = ch - _T('0'); // Convert character to integer
+        }
+        // Check for uppercase hexadecimal characters
+        else if (ch >= _T('A') && ch <= _T('F')) {
+            value = ch - _T('A') + 10; // Convert 'A'-'F' to 10-15
+        }
+
+        ans += (int)pow(16, input.GetLength() - i - 1) * value;
+    }
+
+    return ans;
 }

@@ -718,7 +718,7 @@ void CScientificCtrl::numbersClicked(int number) {
 		m_strInputDisp = m_strInput1;
 	}
 	else {
-		// Prevent overflow
+		// Prevent Overflow
 		if (m_strInput2.GetLength() > 15) {
 			return;
 		}

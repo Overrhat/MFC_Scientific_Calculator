@@ -7,10 +7,11 @@ class CNumberConverter
     * Programmer Calculator
     */
 public:
-    // I/O with numbers instead of string
+    // Input with numbers instead of string
     static CString decToBin(int input);
     static CString decToHex(int input);
     static CString decToOct(int input);
+    static int hexToDect(CString input);
    
 
     /*

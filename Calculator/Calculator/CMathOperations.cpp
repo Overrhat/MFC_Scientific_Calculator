@@ -7,7 +7,6 @@
 #include "CMathOperations.h"
 #include "CNumberConverter.h"
 #include <limits>
-#define NOMINMAX
 
 CString CMathOperations::DoubleToCString(double value) {
     std::ostringstream oss;
@@ -155,26 +154,54 @@ double CMathOperations::logEstimate(double value, double base, int estimationNum
 }
 
 double CMathOperations::addition(double input1, double input2) {
+    if ((input1 > 0 && input2 > DBL_MAX - input1) ||
+        (input1 < 0 && input2 < -DBL_MAX - input1)) {
+        AfxMessageBox(_T("Overflow occurred in addition."));
+        return (input1 > 0) ? DBL_MAX : -DBL_MAX;
+    }
     return input1 + input2;
 }
 
 int CMathOperations::addition(int input1, int input2) {
+    if ((input2 > 0 && input1 > INT_MAX - input2) ||
+        (input2 < 0 && input1 < INT_MIN - input2)) {
+        AfxMessageBox(_T("Overflow occurred in addition."));
+        return (input1 > 0) ? INT_MAX : INT_MIN;
+    }
     return input1 + input2;
 }
 
 double CMathOperations::submation(double input1, double input2) {
+    if ((input2 > 0 && input1 < -DBL_MAX + input2) ||
+        (input2 < 0 && input1 > DBL_MAX + input2)) {
+        AfxMessageBox(_T("Overflow occurred in subtraction."));
+        return (input1 > 0) ? DBL_MAX : -DBL_MAX;
+    }
     return input1 - input2;
 }
 
 int CMathOperations::submation(int input1, int input2) {
+    if ((input2 > 0 && input1 < INT_MIN + input2) ||
+        (input2 < 0 && input1 > INT_MAX + input2)) {
+        AfxMessageBox(_T("Overflow occurred in subtraction."));
+        return (input1 > 0) ? INT_MAX : INT_MIN;
+    }
     return input1 - input2;
 }
 
 double CMathOperations::multiplication(double input1, double input2) {
+    if (input1 != 0 && (input2 > DBL_MAX / input1 || input2 < -DBL_MAX / input1)) {
+        AfxMessageBox(_T("Overflow occurred in multiplication."));
+        return (input1 > 0) ? DBL_MAX : -DBL_MAX;
+    }
     return input1 * input2;
 }
 
 int CMathOperations::multiplication(int input1, int input2) {
+    if (input1 != 0 && (input2 > INT_MAX / input1 || input2 < INT_MIN / input1)) {
+        AfxMessageBox(_T("Overflow occurred in multiplication."));
+        return (input1 > 0) ? INT_MAX : INT_MIN;
+    }
     return input1 * input2;
 }
 
@@ -283,7 +310,7 @@ double CMathOperations::sigma(int upperLim, int lowerLim, CString equation) {
     // Evaluate
     double ans = 0.0;
    
-    for (int i = lowerLim; i <= upperLim; i++) {
+    for (int i = lowerLim; i <= upperLim; ++i) {
         std::string cloneStr = std::string(CT2CA(equation));
 
         // Substitute variables
@@ -292,11 +319,11 @@ double CMathOperations::sigma(int upperLim, int lowerLim, CString equation) {
         // Evaluate the substituted expression
         double result = CNumberConverter::evaluateExpression(cloneStr);
 
-        // Overflow detection 
-        if ((result > 0 && ans > INT_MAX - result) ||
-            (result < 0 && ans < INT_MIN - result)) {
+        // Overflow detection for double type
+        if ((result > 0 && ans > DBL_MAX - result) ||
+            (result < 0 && ans < -DBL_MAX - result)) {
             AfxMessageBox(_T("Overflow occurred during calculation."));
-            return (result > 0) ? INT_MAX : INT_MIN; // if positive then max if negative then min
+            return (result > 0) ? DBL_MAX : -DBL_MAX; // if positive then max, if negative then min
         }
 
         // Accumulate the result
@@ -310,7 +337,7 @@ CString CMathOperations::sigmaWorkings(int upperLim, int lowerLim, CString equat
     // Evaluate
     CString working;
 
-    for (int i = lowerLim; i <= upperLim; i++) {
+    for (int i = lowerLim; i <= upperLim; ++i) {
         std::string cloneStr = std::string(CT2CA(equation));
 
         // Substitute variables
@@ -325,12 +352,8 @@ CString CMathOperations::sigmaWorkings(int upperLim, int lowerLim, CString equat
             working += _T(" + ");
         }
         working += workingAdd;
-
     }
 
     // Display everything needed
-    // (Truncate is usually a function that is used for integers but
-    // this limits the length to be shorter than the input)
-    working.Truncate(working.GetLength()); 
     return working;
 }

@@ -222,13 +222,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 2: // Submation
 		// Depends on what number systems
@@ -249,13 +242,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 3: // Multiplication
 		// Depends on what number systems
@@ -276,13 +262,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 4: // Division
 		// Handle the division by 0
@@ -296,7 +275,8 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_num2 = 0;
 			m_strOutputDisp = ("Can't divide by 0!");
 			m_pDlg->SetOutput(m_strOutputDisp);
-			break;
+			m_isFirst = true; // Bringing back to the first input after equal button
+			return;
 		}
 
 		// Depends on what number systems
@@ -317,13 +297,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 5: // Modulus
 		// Handle the modulo by 0
@@ -337,7 +310,8 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_num2 = 0;
 			m_strOutputDisp = ("Modulo by 0 is Invalid");
 			m_pDlg->SetOutput(m_strOutputDisp);
-			break;
+			m_isFirst = true; // Bringing back to the first input after equal button
+			return;
 		}
 
 		// Depends on what number systems
@@ -358,13 +332,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 6: // Left Shift
 		// Depends on what number systems
@@ -385,13 +352,6 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	case 7: // Right Shift
 		// Depends on what number systems
@@ -412,15 +372,16 @@ void CProgrammerCtrl::bnClickedButtonEqual() {
 			m_strOutputDisp = CNumberConverter::decToHex(m_num1);
 		}
 
-		// Update
-		m_strInputDisp = _T("");
-		m_pDlg->SetInput(m_strInputDisp);
-		m_strInput1 = m_strOutputDisp;
-		m_strInput2 = _T("");
-		m_num2 = 0;
-		m_pDlg->SetOutput(m_strOutputDisp);
 		break;
 	}
+	// Update
+	m_strInputDisp = _T("");
+	m_pDlg->SetInput(m_strInputDisp);
+	m_strInput1 = m_strOutputDisp;
+	m_strInput2 = _T("");
+	m_num2 = 0;
+	m_pDlg->SetOutput(m_strOutputDisp);
+
 	m_isFirst = true; // Bringing back to the first input after equal button
 }
 
@@ -756,8 +717,8 @@ void CProgrammerCtrl::numbersClicked(CString digit) {
 
 	// Appending the new input
 	if (m_isFirst) {
-		// Prevent overflow
-		if (m_num1 > 99999999) {
+		// Prevent Overflow
+		if (m_strInput1.GetLength() > 9) {
 			return;
 		}
 
@@ -786,8 +747,8 @@ void CProgrammerCtrl::numbersClicked(CString digit) {
 		m_strInputDisp = m_strInput1;
 	}
 	else {
-		// Prevent overflow
-		if (m_num2 > 99999999) {
+		// Prevent Overflow
+		if (m_strInput2.GetLength() > 9) {
 			return;
 		}
 

@@ -30,8 +30,8 @@ void CSigmaCtrl::bnClickedAns(CString upperLim, CString lowerLim, CString inputS
     if (!(this->isInputValid(m_strInputDisp, m_strUpperDisp, m_strLowerDisp))) {
         AfxMessageBox(_T("Invalid Input! Please try again!"), MB_ICONWARNING | MB_OK);
         m_sDlg->SetInput(_T(""));
-        m_sDlg->SetUpper(_T(""));
-        m_sDlg->SetLower(_T(""));
+        m_sDlg->SetUpper(_T("10"));
+        m_sDlg->SetLower(_T("1"));
         return;
     }
 
@@ -65,18 +65,95 @@ bool CSigmaCtrl::isInputValid(const CString& inputStr, const CString& upperLim, 
         return false;
     }
 
+    // Convert CString to std::string
+    std::string inputStrStd = std::string(CT2A(inputStr));
+    std::string upperLimStd = std::string(CT2A(upperLim));
+    std::string lowerLimStd = std::string(CT2A(lowerLim));
+
+    // Check if the number of opening and closing brackets are the same
+    int bracketCount = 0;
+    for (char ch : inputStrStd) {
+        if (ch == '(') {
+            bracketCount++;
+        }
+        else if (ch == ')') {
+            bracketCount--;
+        }
+        if (bracketCount < 0) { // More closing brackets than opening brackets
+            return false;
+        }
+    }
+    if (bracketCount != 0) { // Unbalanced brackets
+        return false;
+    }
+
+    // Check for consecutive operators
+    const std::string operators = "+-*/";
+    for (size_t i = 1; i < inputStrStd.size(); ++i) {
+        if (operators.find(inputStrStd[i - 1]) != std::string::npos &&
+            operators.find(inputStrStd[i]) != std::string::npos) {
+            return false; // Found consecutive operators
+        }
+    }
+
+    // Check the number of operators vs operands
+    int operandCount = 0, operatorCount = 0;
+    bool firstIsNegative = false;
+    int i = 0;
+
+    // Checking if the first occurence is negative number
+    while (!firstIsNegative) {
+        char ch = inputStrStd[i];
+        if (ch == '(') {
+            i++;
+            continue;
+        }
+        else if (ch == '-') {
+            firstIsNegative = true;
+        }
+        else {
+            break;
+        }
+    }
+
+    // Identify operands and operators
+    bool lastWasDigit = false;
+    for (size_t i = 0; i < inputStrStd.size(); ++i) {
+        char ch = inputStrStd[i];
+        if (isdigit(ch) || ch == 'n') {
+            if (!lastWasDigit) { // New operand starts
+                operandCount++;
+            }
+            lastWasDigit = true;
+        }
+        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+            operatorCount++;
+            lastWasDigit = false;
+        }
+        else {
+            lastWasDigit = false; // Reset for non-digit characters
+        }
+    }
+
+    // Validate operator and operand counts
+    if (firstIsNegative) {
+        if (operatorCount > operandCount) { // Allow operators == operands in this case
+            return false;
+        }
+    }
+    else {
+        if (operatorCount >= operandCount) { // Strictly fewer operators than operands
+            return false;
+        }
+    }
+
     // Define the unwanted patterns for inputStr
-    std::regex invalidInputStrPattern("[a-mo-zA-MO-Z]"); // Invalid characters in inputStr
+    std::regex invalidInputStrPattern("[a-mp-zA-MP-Z]"); // Invalid characters in inputStr
     std::regex numberSpaceLetterPattern("\\d+\\s+[a-zA-Z]"); // A number followed by a space and a letter
     std::regex divisionByZeroPattern("/\\s*0");             // Division by zero
 
     // Define the unwanted patterns for upperLim and lowerLim
     std::regex invalidLimPattern("[a-zA-Z]|\\."); // Invalid characters in limits
-
-    // Convert CString to std::string
-    std::string inputStrStd = std::string(CT2A(inputStr));
-    std::string upperLimStd = std::string(CT2A(upperLim));
-    std::string lowerLimStd = std::string(CT2A(lowerLim));
 
     // Check inputStr for invalid characters or number-space-letter pattern
     if (std::regex_search(inputStrStd, invalidInputStrPattern) ||
@@ -119,4 +196,3 @@ bool CSigmaCtrl::isInputValid(const CString& inputStr, const CString& upperLim, 
 
     return true;
 }
-

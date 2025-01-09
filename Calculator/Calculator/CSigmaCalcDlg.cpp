@@ -105,4 +105,3 @@ void CSigmaCalcDlg::SetOutput(const int& output)
     UpdateData(FALSE);
 }
 
-
